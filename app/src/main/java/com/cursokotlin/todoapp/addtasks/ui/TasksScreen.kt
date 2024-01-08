@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
@@ -35,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.cursokotlin.todoapp.addtasks.ui.model.TasksModel
 
 
 @Composable
@@ -43,7 +45,7 @@ fun TasksScreen(tasksViewModel: TasksViewModel) {
     val showDialog: Boolean by tasksViewModel.showDialog.observeAsState(false)
 
     Box(modifier = Modifier.fillMaxSize()) {
-        ItemTask()
+
         AddTasksDialog(
             showDialog,
             onDismiss = { tasksViewModel.onDialogClose() },
@@ -57,14 +59,19 @@ fun TasksScreen(tasksViewModel: TasksViewModel) {
 
 @Composable
 fun TasksList(tasksViewModel: TasksViewModel) {
+    val myTasks: List<TasksModel> = tasksViewModel.tasks
     LazyColumn {
+        items(myTasks, key = {it.id}) {
+            ItemTask(tasksModel = it, tasksViewModel =tasksViewModel)
+
+        }
 
     }
 }
 
-@Preview
+
 @Composable
-fun ItemTask() {
+fun ItemTask(tasksModel: TasksModel, tasksViewModel: TasksViewModel) {
 
     Card(
         Modifier
@@ -75,12 +82,15 @@ fun ItemTask() {
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "Ejemplo", modifier = Modifier.padding(horizontal = 4.dp)
+                text = tasksModel.task, modifier = Modifier
+                    .padding(horizontal = 4.dp)
                     .weight(1f)
 
 
             )
-            Checkbox(checked = true, onCheckedChange = {})
+            Checkbox(
+                checked = tasksModel.selected,
+                onCheckedChange = { tasksViewModel.onCheckBoxSelected(tasksModel) })
         }
     }
 
@@ -123,6 +133,7 @@ fun AddTasksDialog(show: Boolean, onDismiss: () -> Unit, onTaskAdded: (String) -
                 Spacer(modifier = Modifier.size(16.dp))
                 Button(onClick = {
                     onTaskAdded(myTask)
+                    myTask=""
                 }, modifier = Modifier.fillMaxWidth()) {
                     Text(text = "Añadir Tarea")
 
