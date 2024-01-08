@@ -1,6 +1,5 @@
 package com.cursokotlin.todoapp.addtasks.ui
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -34,6 +33,12 @@ class TasksViewModel @Inject constructor() : ViewModel() {
         _tasks[index] = _tasks[index].let {
             it.copy(selected = !it.selected)
         }
+
+    }
+
+    fun OnItemRemove(tasksModel: TasksModel) {
+       val task = _tasks.find { it.id==tasksModel.id }
+        _tasks.remove(task)
 
     }
 }
