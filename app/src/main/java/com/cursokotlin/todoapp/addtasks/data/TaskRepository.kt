@@ -6,6 +6,9 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * Es la puerta de entrada de la capa de "data"
+ */
 @Singleton
 class TaskRepository @Inject constructor(private val taskDao: TaskDao) {
 
