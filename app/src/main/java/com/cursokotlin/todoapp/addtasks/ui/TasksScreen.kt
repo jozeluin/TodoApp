@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -27,43 +28,64 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.cursokotlin.todoapp.addtasks.ui.model.TasksModel
 
 
 @Composable
 fun TasksScreen(tasksViewModel: TasksViewModel) {
-
     val showDialog: Boolean by tasksViewModel.showDialog.observeAsState(false)
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    val uiState by produceState<TasksUiState>(
+        initialValue = TasksUiState.Loading,
+        key1 = lifecycle,
+        key2 = tasksViewModel
+    ) {
+        lifecycle.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
+            tasksViewModel.uiState.collect { value = it }
+        }
+    }
+    when (uiState) {
+        is TasksUiState.Error -> {}
+        TasksUiState.Loading -> { CircularProgressIndicator()}
+        is TasksUiState.Success -> {
+            Box(modifier = Modifier.fillMaxSize()) {
 
-        AddTasksDialog(
-            showDialog,
-            onDismiss = { tasksViewModel.onDialogClose() },
-            onTaskAdded = { tasksViewModel.onTaskCreated(it) })
-        FabDialog(Modifier.align(Alignment.BottomEnd), tasksViewModel)
-        TasksList(tasksViewModel)
+                AddTasksDialog(
+                    showDialog,
+                    onDismiss = { tasksViewModel.onDialogClose() },
+                    onTaskAdded = { tasksViewModel.onTaskCreated(it) })
+                FabDialog(Modifier.align(Alignment.BottomEnd), tasksViewModel)
+                TasksList((uiState as TasksUiState.Success).tasks,tasksViewModel)
+            }
+        }
     }
 
 
 }
 
 @Composable
-fun TasksList(tasksViewModel: TasksViewModel) {
-    val myTasks: List<TasksModel> = tasksViewModel.tasks
+fun TasksList(tasks: List<TasksModel>,tasksViewModel: TasksViewModel) {
+    //No nos hace falta
+    //val myTasks: List<TasksModel> = tasksViewModel.tasks
+
     LazyColumn {
-        items(myTasks, key = {it.id}) {
-            ItemTask(tasksModel = it, tasksViewModel =tasksViewModel)
+        items(tasks, key = { it.id }) {
+          //  ItemTask(tasksModel = it, tasksViewModel = tasksViewModel)
 
         }
 
@@ -79,11 +101,10 @@ fun ItemTask(tasksModel: TasksModel, tasksViewModel: TasksViewModel) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .pointerInput(Unit) {
-                detectTapGestures  (onLongPress = {
+                detectTapGestures(onLongPress = {
                     tasksViewModel.OnItemRemove(tasksModel)
                 })
-            }
-        ,
+            },
         // border = BorderStroke(2.dp, Color.Magenta),
         elevation = 8.dp
     ) {
@@ -102,7 +123,6 @@ fun ItemTask(tasksModel: TasksModel, tasksViewModel: TasksViewModel) {
     }
 
 }
-
 
 
 @Composable
@@ -141,7 +161,7 @@ fun AddTasksDialog(show: Boolean, onDismiss: () -> Unit, onTaskAdded: (String) -
                 Spacer(modifier = Modifier.size(16.dp))
                 Button(onClick = {
                     onTaskAdded(myTask)
-                    myTask=""
+                    myTask = ""
                 }, modifier = Modifier.fillMaxWidth()) {
                     Text(text = "Añadir Tarea")
 
