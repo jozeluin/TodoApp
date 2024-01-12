@@ -85,7 +85,7 @@ fun TasksList(tasks: List<TasksModel>,tasksViewModel: TasksViewModel) {
 
     LazyColumn {
         items(tasks, key = { it.id }) {
-          //  ItemTask(tasksModel = it, tasksViewModel = tasksViewModel)
+            ItemTask(tasksModel = it, tasksViewModel = tasksViewModel)
 
         }
 

@@ -9,6 +9,7 @@ import com.cursokotlin.todoapp.addtasks.domain.AddTaskUseCase
 import com.cursokotlin.todoapp.addtasks.domain.GetTasksUseCase
 import com.cursokotlin.todoapp.addtasks.ui.TasksUiState.Success
 import com.cursokotlin.todoapp.addtasks.ui.model.TasksModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -16,7 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
+@HiltViewModel
 class TasksViewModel @Inject constructor(
     private val addTasksUiState: AddTaskUseCase,
     getTasksUseCase: GetTasksUseCase
