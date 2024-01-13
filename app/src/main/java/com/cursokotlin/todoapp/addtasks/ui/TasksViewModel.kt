@@ -22,6 +22,7 @@ class TasksViewModel @Inject constructor(
     private val addTasksUiState: AddTaskUseCase,
     getTasksUseCase: GetTasksUseCase
 
+
 ) : ViewModel() {
     //Decimos que por cada elemento del StateFlow (nos metemos en Success) lo transformamos en taskModel
     val uiState: StateFlow<TasksUiState> = getTasksUseCase().map(::Success)
