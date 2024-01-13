@@ -1,12 +1,12 @@
 package com.cursokotlin.todoapp.addtasks.ui
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cursokotlin.todoapp.addtasks.domain.AddTaskUseCase
 import com.cursokotlin.todoapp.addtasks.domain.GetTasksUseCase
+import com.cursokotlin.todoapp.addtasks.domain.UpdateTaskUseCase
 import com.cursokotlin.todoapp.addtasks.ui.TasksUiState.Success
 import com.cursokotlin.todoapp.addtasks.ui.model.TasksModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,9 +17,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 @HiltViewModel
 class TasksViewModel @Inject constructor(
     private val addTasksUiState: AddTaskUseCase,
+    private val updateTaskUseCase: UpdateTaskUseCase,
     getTasksUseCase: GetTasksUseCase
 
 
@@ -35,7 +37,7 @@ class TasksViewModel @Inject constructor(
     private val _showDialog = MutableLiveData<Boolean>()
     val showDialog: LiveData<Boolean> = _showDialog
 
-
+//Para borrar ya no se uiliza esto, hay que hacerlo desde la base de datos
     //private val _tasks = mutableStateListOf<TasksModel>()
     //val tasks: List<TasksModel> = _tasks
 
@@ -59,19 +61,22 @@ class TasksViewModel @Inject constructor(
     }
 
     fun onCheckBoxSelected(tasksModel: TasksModel) {
-//Actualizar check
+        //Actualizar check
 
-    //    val index = _tasks.indexOf(tasksModel)
-    //    _tasks[index] = _tasks[index].let {
-     //       it.copy(selected = !it.selected)
-       // }
+        //    val index = _tasks.indexOf(tasksModel)
+        //    _tasks[index] = _tasks[index].let {
+        //       it.copy(selected = !it.selected)
+        // }
+        viewModelScope.launch {
+            updateTaskUseCase(tasksModel.copy(selected = !tasksModel.selected))
+        }
 
     }
 
     fun OnItemRemove(tasksModel: TasksModel) {
 //borrar item
-  //     val task = _tasks.find { it.id == tasksModel.id }
-   //     _tasks.remove(task)
+        //     val task = _tasks.find { it.id == tasksModel.id }
+        //     _tasks.remove(task)
 
     }
 }
