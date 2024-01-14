@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cursokotlin.todoapp.addtasks.domain.AddTaskUseCase
+import com.cursokotlin.todoapp.addtasks.domain.DeleteTaskUseCae
 import com.cursokotlin.todoapp.addtasks.domain.GetTasksUseCase
 import com.cursokotlin.todoapp.addtasks.domain.UpdateTaskUseCase
 import com.cursokotlin.todoapp.addtasks.ui.TasksUiState.Success
@@ -22,6 +23,7 @@ import javax.inject.Inject
 class TasksViewModel @Inject constructor(
     private val addTasksUiState: AddTaskUseCase,
     private val updateTaskUseCase: UpdateTaskUseCase,
+    private val deleteTaskUseCae: DeleteTaskUseCae,
     getTasksUseCase: GetTasksUseCase
 
 
@@ -74,9 +76,13 @@ class TasksViewModel @Inject constructor(
     }
 
     fun OnItemRemove(tasksModel: TasksModel) {
-//borrar item
+
         //     val task = _tasks.find { it.id == tasksModel.id }
         //     _tasks.remove(task)
+
+        viewModelScope.launch {
+            deleteTaskUseCae(tasksModel)
+        }
 
     }
 }
